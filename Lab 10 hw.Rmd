@@ -1,0 +1,64 @@
+---
+title: "Lab 10"
+author: "Ruixuan Hu"
+date: "11/22/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+1. Write a function that calculates cumulative distribution function of a binomial random variable. Compare results from your function with pbinom() function.
+
+```{r}
+cdf<- function(q,n,π) {
+count=0
+  for (i in 1:q) {
+    Pri=choose(n,i)*(π^i)*((1-π)^(n-i)) 
+    count=count+Pri
+  }
+return(count)
+}
+
+cdf(2,6,0.5)
+pbinom(2,6,0.5)
+cdf(3,7,0.6)
+pbinom(3,7,0.6)
+```
+
+From the result above, we can figure out that the results are really similar.
+  
+
+
+
+2. Write a function that runs simulations to obtain power from a one-sample t-test. Run your function (with number of simulations = 10,000 ) with n = 30, delta = 0.5, sd = 1 and sig.level = 0.05. Compare your results with power.t.test(n = 30, delta = 0.5, sd = 1, sig.level = 0.05, type = ‘one.sample’).
+
+
+First, turn my simulations to a function.
+```{r}
+PowerSim <- function(n,delta,sd,sig.level) {
+  data<-data.frame(num=rnorm(n=n,mean = 3,sd=sd))
+  Sim<- t.test(data$num,mu=3+delta)
+  return(Sim$p.value)
+ 
+}
+PowerSim(30,0.5,1,0.05)
+```
+
+Now replicate the simulation 10000 times.
+```{r}
+set.seed(12345)
+my_reps <- replicate(10000,PowerSim(30,0.5,1,0.05))
+  aplha=sig.level=0.05
+  power <- mean(my_reps < aplha)
+  power
+
+```
+So from my outcome, the result is 0.7492. Let us then use power.t.test.
+```{r}
+power.t.test(n = 30, delta = 0.5, sd = 1, sig.level = 0.05, type = "one.sample")
+```
+
+As we can see, the power power.t.test calculates is 0.7540. From the result above, we can figure out that the results are really similar.
